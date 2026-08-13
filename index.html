@@ -74,12 +74,14 @@
             border-color: var(--primary-color);
         }
 
+        /* راست‌چین کردن کادر ورود کانفیگ */
         #configInput {
             min-height: 100px;
             direction: rtl;
             text-align: right;
         }
 
+        /* چپ‌چین ماندن خروجی JSON برای خوانایی بهتر کدها */
         #jsonOutput {
             min-height: 300px;
             white-space: pre-wrap;
@@ -104,18 +106,13 @@
             background-color: var(--primary-hover);
         }
 
-        .action-btn {
+        #copyBtn {
             background-color: var(--success-color);
-        }
-
-        .action-btn:hover {
-            background-color: #01bdae;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
             margin-top: 10px;
+        }
+
+        #copyBtn:hover {
+            background-color: #01bdae;
         }
 
         .output-section {
@@ -135,13 +132,26 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* تنظیمات ریسپانسیو برای نمایشگرهای کوچک و موبایل */
         @media (max-width: 600px) {
-            body { padding: 10px; }
-            .container { padding: 20px 15px; gap: 15px; }
-            h1 { font-size: 1.1rem; }
-            textarea { padding: 12px; font-size: 13px; }
-            button { font-size: 14px; padding: 10px 15px; }
-            .button-group { flex-direction: column; }
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 20px 15px;
+                gap: 15px;
+            }
+            h1 {
+                font-size: 1.1rem;
+            }
+            textarea {
+                padding: 12px;
+                font-size: 13px;
+            }
+            button {
+                font-size: 14px;
+                padding: 10px 15px;
+            }
         }
     </style>
 </head>
@@ -151,7 +161,7 @@
         <h1>تبدیل لینک V2Ray به Config.json</h1>
         
         <div>
-            <label class="label-title" for="configInput">لینک کانفیگ خود را وارد کنید (vless یا vmess):</label>
+            <label class="label-title" for="configInput">لینک کانفیگ خود را وارد کنید (vless ws):</label>
             <textarea id="configInput" placeholder="کانفیگ خود را وارد کنید..."></textarea>
         </div>
         
@@ -160,12 +170,7 @@
         <div class="output-section" id="outputContainer">
             <label class="label-title">خروجی JSON (config.json):</label>
             <textarea id="jsonOutput" readonly></textarea>
-            
-            <!-- دکمه‌های کپی به دو صورت مختلف -->
-            <div class="button-group">
-                <button id="copyJsonBtn" class="action-btn">کپی کانفیگ (JSON)</button>
-                <button id="copyBase64Btn" class="action-btn">کپی کانفیگ (Base64)</button>
-            </div>
+            <button id="copyBtn">کپی کانفیگ</button>
         </div>
     </div>
 
@@ -174,9 +179,7 @@
         const baseConfig = {
             "remarks": "",
             "log": {
-                "loglevel": "warning",
-                "dnsLog": false,
-                "access": "none"
+                "loglevel": "warning"
             },
             "dns": {
                 "hosts": {
@@ -202,19 +205,35 @@
                     "protocol": "mixed",
                     "sniffing": {
                         "enabled": true,
-                        "destOverride": ["http", "tls", "quic", "fakedns"],
+                        "destOverride": [
+                            "http",
+                            "tls",
+                            "quic",
+                            "fakedns"
+                        ],
                         "routeOnly": false
                     },
-                    "settings": { "auth": "noauth", "udp": true, "allowTransparent": false }
+                    "settings": {
+                        "auth": "noauth",
+                        "udp": true,
+                        "allowTransparent": false
+                    }
                 },
                 {
                     "tag": "tls-decrypt-h211",
                     "listen": "0.0.0.0",
                     "port": 40444,
                     "protocol": "tunnel",
-                    "settings": { "network": "tcp", "port": 443, "followRedirect": true },
+                    "settings": {
+                        "network": "tcp",
+                        "port": 443,
+                        "followRedirect": true
+                    },
                     "streamSettings": {
-                        "sockopt": { "tcpKeepAliveInterval": 1, "tcpKeepAliveIdle": 11 },
+                        "sockopt": {
+                            "tcpKeepAliveInterval": 1,
+                            "tcpKeepAliveIdle": 11
+                        },
                         "security": "tls",
                         "tlsSettings": {
                             "alpn": ["h2", "http/1.1"],
@@ -257,7 +276,14 @@
                             {
                                 "address": "127.0.0.1",
                                 "port": 40444,
-                                "users": [{ "id": "", "email": "t@t.tt", "security": "auto", "encryption": "none" }]
+                                "users": [
+                                    {
+                                        "id": "",
+                                        "email": "t@t.tt",
+                                        "security": "auto",
+                                        "encryption": "none"
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -270,14 +296,24 @@
                             "fingerprint": "ios",
                             "pinnedPeerCertSha256": "3de5b7bd48c18c9ff057d8961f24c16555a7e387ebb509e1efb1315303695c82"
                         },
-                        "wsSettings": { "path": "/", "headers": { "User-Agent": "edge" } }
+                        "wsSettings": {
+                            "path": "/",
+                            "headers": {
+                                "User-Agent": "edge"
+                            }
+                        }
                     },
-                    "mux": { "enabled": false, "concurrency": -1 }
+                    "mux": {
+                        "enabled": false,
+                        "concurrency": -1
+                    }
                 },
                 {
                     "tag": "tls-repack-frommitm",
                     "protocol": "direct",
-                    "settings": { "redirect": "188.114.97.2:443" },
+                    "settings": {
+                        "redirect": "188.114.97.2:443"
+                    },
                     "streamSettings": {
                         "security": "tls",
                         "tlsSettings": {
@@ -298,7 +334,11 @@
                 {
                     "tag": "direct",
                     "protocol": "freedom",
-                    "streamSettings": { "sockopt": { "domainStrategy": "UseIP" } }
+                    "streamSettings": {
+                        "sockopt": {
+                            "domainStrategy": "UseIP"
+                        }
+                    }
                 },
                 {
                     "tag": "block",
@@ -308,11 +348,30 @@
             "routing": {
                 "domainStrategy": "IPIfNonMatch",
                 "rules": [
-                    { "type": "field", "port": 53, "outboundTag": "proxy" },
-                    { "type": "field", "domain": ["domain:adguard-dns.com"], "outboundTag": "proxy" },
-                    { "type": "field", "inboundTag": ["tls-decrypt-h211"], "outboundTag": "tls-repack-frommitm" },
-                    { "type": "field", "outboundTag": "direct", "domain": ["domain:.ir"] },
-                    { "type": "field", "outboundTag": "direct", "ip": ["geoip:ir", "geoip:private"] }
+                    {
+                        "type": "field",
+                        "port": 53,
+                        "outboundTag": "proxy"
+                    },
+                    {
+                        "type": "field",
+                        "domain": [
+                            "domain:adguard-dns.com"
+                        ],
+                        "outboundTag": "proxy"
+                    },
+                    {
+                        "type": "field",
+                        "inboundTag": ["tls-decrypt-h211"],
+                        "outboundTag": "tls-repack-frommitm"
+                    },
+                    {
+                        "type": "field",
+                        "outboundTag": "direct",
+                        "domain": [
+                            "domain:.ir"
+                        ]
+                    }
                 ]
             }
         };
@@ -328,6 +387,7 @@
             let uuid = "", sni = "", accountName = "";
 
             try {
+                // استخراج اطلاعات اگر لینک vmess (Base64) باشد
                 if (inputStr.startsWith("vmess://")) {
                     const base64Str = inputStr.substring(8);
                     const decoded = decodeURIComponent(escape(atob(base64Str)));
@@ -336,17 +396,22 @@
                     uuid = vmessObj.id || "";
                     sni = vmessObj.sni || vmessObj.host || vmessObj.add || "";
                     accountName = vmessObj.ps || "";
-                } else {
+                } 
+                // استخراج اطلاعات برای لینک‌های استاندارد مثل vless:// 
+                else {
                     const fakeUrlStr = inputStr.replace(/^[a-zA-Z]+:\/\//, 'http://');
                     const url = new URL(fakeUrlStr);
                     
                     uuid = url.username;
                     sni = url.searchParams.get('sni') || url.hostname;
+                    
+                    // استخراج نام اکانت از هشتگ (hash)
                     if (url.hash) {
                         accountName = decodeURIComponent(url.hash.substring(1));
                     }
                 }
             } catch (e) {
+                // روش جایگزین با Regex در صورتی که URL نامعتبر باشد
                 const uuidMatch = inputStr.match(/:\/\/(.+?)@/);
                 if (uuidMatch) uuid = uuidMatch[1];
                 
@@ -361,30 +426,41 @@
                 alert("شناسه UUID در این کانفیگ یافت نشد! لطفاً یک کانفیگ معتبر وارد کنید.");
                 return;
             }
+
             if (!sni) sni = "your-domain.com";
 
+            // یک کپی از فایل قالب می‌گیریم تا اصلی تغییر نکند
             const newConfig = JSON.parse(JSON.stringify(baseConfig));
 
+            // ایجاد متن remarks با اضافه کردن "اصلاح شده"
             if (accountName) {
                 newConfig.remarks = accountName + " اصلاح شده";
             } else {
                 newConfig.remarks = "کانفیگ اصلاح شده";
             }
 
+            // جاگذاری مقادیر استخراج شده در قالب
             newConfig.outbounds[0].settings.vnext[0].users[0].id = uuid;
             newConfig.outbounds[0].streamSettings.tlsSettings.serverName = sni;
 
+            // نمایش خروجی JSON در کادر
             const outputElem = document.getElementById('jsonOutput');
             outputElem.value = JSON.stringify(newConfig, null, 2);
+            
+            // نمایش بخش خروجی
             document.getElementById('outputContainer').style.display = 'block';
         });
 
-        // تابع کمکی برای انجام کپی با افکت تغییر دکمه
-        function copyToClipboard(textToCopy, btnId) {
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                const btn = document.getElementById(btnId);
+        // تنظیم عملکرد دکمه کپی
+        document.getElementById('copyBtn').addEventListener('click', function() {
+            const outputElem = document.getElementById('jsonOutput');
+            outputElem.select();
+            outputElem.setSelectionRange(0, 99999); // برای موبایل
+            
+            navigator.clipboard.writeText(outputElem.value).then(() => {
+                const btn = document.getElementById('copyBtn');
                 const originalText = btn.innerText;
-                btn.innerText = "کپی شد! ✔";
+                btn.innerText = "کانفیگ کپی شد! ✔";
                 btn.style.backgroundColor = "#4caf50";
                 
                 setTimeout(() => {
@@ -394,24 +470,6 @@
             }).catch(err => {
                 alert("خطا در کپی کردن: " + err);
             });
-        }
-
-        // دکمه کپی به صورت JSON معمولی
-        document.getElementById('copyJsonBtn').addEventListener('click', function() {
-            const outputElem = document.getElementById('jsonOutput');
-            outputElem.select();
-            outputElem.setSelectionRange(0, 99999);
-            copyToClipboard(outputElem.value, 'copyJsonBtn');
-        });
-
-        // دکمه کپی به صورت Base64
-        document.getElementById('copyBase64Btn').addEventListener('click', function() {
-            const jsonStr = document.getElementById('jsonOutput').value;
-            if (!jsonStr) return;
-            
-            // استفاده از unescape و encodeURIComponent برای پشتیبانی صحیح از حروف فارسی (مثل نام اکانت) در Base64
-            const base64Str = btoa(unescape(encodeURIComponent(jsonStr)));
-            copyToClipboard(base64Str, 'copyBase64Btn');
         });
     </script>
 </body>
