@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>سازنده کانفیگ V2Ray (Config.json)</title>
     <!-- اضافه کردن فونت فارسی Vazirmatn -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
@@ -45,13 +45,16 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            box-sizing: border-box;
         }
 
         h1 {
             text-align: center;
             margin: 0;
-            font-size: 1.5rem;
-            color: #ffffff; /* تغییر رنگ عنوان به سفید */
+            font-size: 1.3rem; /* سایز متناسب‌تر */
+            font-weight: 500;  /* کاهش ضخامت برای ظریف‌تر شدن */
+            color: #ffffff;
+            letter-spacing: 0.5px;
         }
 
         textarea {
@@ -128,6 +131,28 @@
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* تنظیمات ریسپانسیو برای نمایشگرهای کوچک و موبایل */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 20px 15px;
+                gap: 15px;
+            }
+            h1 {
+                font-size: 1.1rem;
+            }
+            textarea {
+                padding: 12px;
+                font-size: 13px;
+            }
+            button {
+                font-size: 14px;
+                padding: 10px 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -150,7 +175,7 @@
     </div>
 
     <script>
-        // ساختار پایه JSON مورد نظر شما (بخش host حذف شد)
+        // ساختار پایه JSON مورد نظر شما با تنظیمات ضد نشت DNS و سرور AdGuard
         const baseConfig = {
             "log": {
                 "loglevel": "warning",
@@ -159,20 +184,11 @@
             },
             "dns": {
                 "hosts": {
-                    "dns.google": [
-                        "8.8.8.8"
-                    ],
-                    "proxy.example.com": [
-                        "127.0.0.1"
-                    ]
+                    "dns.adguard-dns.com": "94.140.14.14"
                 },
                 "servers": [
-                    {
-                        "address": "8.8.8.8",
-                        "skipFallback": true
-                    }
-                ],
-                "tag": "dns-module"
+                    "https://dns.adguard-dns.com/dns-query"
+                ]
             },
             "policy": {
                 "levels": {
@@ -335,6 +351,18 @@
                 "rules": [
                     {
                         "type": "field",
+                        "port": 53,
+                        "outboundTag": "proxy"
+                    },
+                    {
+                        "type": "field",
+                        "domain": [
+                            "domain:adguard-dns.com"
+                        ],
+                        "outboundTag": "proxy"
+                    },
+                    {
+                        "type": "field",
                         "inboundTag": ["tls-decrypt-h211"],
                         "outboundTag": "tls-repack-frommitm"
                     },
@@ -352,13 +380,6 @@
                             "geoip:ir",
                             "geoip:private"
                         ]
-                    },
-                    {
-                        "type": "field",
-                        "inboundTag": [
-                            "dns-module"
-                        ],
-                        "outboundTag": "proxy"
                     }
                 ]
             }
@@ -411,7 +432,7 @@
             // یک کپی از فایل قالب می‌گیریم تا اصلی تغییر نکند
             const newConfig = JSON.parse(JSON.stringify(baseConfig));
 
-            // جاگذاری مقادیر استخراج شده در قالب (بخش host حذف شده است)
+            // جاگذاری مقادیر استخراج شده در قالب
             newConfig.outbounds[0].settings.vnext[0].users[0].id = uuid;
             newConfig.outbounds[0].streamSettings.tlsSettings.serverName = sni;
 
