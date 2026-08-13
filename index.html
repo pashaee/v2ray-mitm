@@ -179,9 +179,7 @@
         const baseConfig = {
             "remarks": "",
             "log": {
-                "loglevel": "warning",
-                "dnsLog": false,
-                "access": "none"
+                "loglevel": "warning"
             },
             "dns": {
                 "hosts": {
@@ -190,14 +188,6 @@
                 "servers": [
                     "https://dns.adguard-dns.com/dns-query"
                 ]
-            },
-            "policy": {
-                "levels": {
-                    "0": {
-                        "uplinkOnly": 0,
-                        "downlinkOnly": 0
-                    }
-                }
             },
             "inbounds": [
                 {
@@ -372,14 +362,6 @@
                         "outboundTag": "direct",
                         "domain": [
                             "domain:.ir"
-                        ]
-                    },
-                    {
-                        "type": "field",
-                        "outboundTag": "direct",
-                        "ip": [
-                            "geoip:ir",
-                            "geoip:private"
                         ]
                     }
                 ]
