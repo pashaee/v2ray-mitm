@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سازنده کانفیگ V2Ray (Config.json)</title>
+    <!-- اضافه کردن فونت فارسی Vazirmatn -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        :root {
+            --bg-color: #121212;
+            --container-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --primary-color: #bb86fc;
+            --primary-hover: #9e67e3;
+            --input-bg: #2d2d2d;
+            --border-color: #3d3d3d;
+            --success-color: #03dac6;
+        }
+
+        body {
+            font-family: 'Vazirmatn', Tahoma, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: var(--container-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 700px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        textarea {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 14px;
+            resize: vertical;
+            box-sizing: border-box;
+            direction: ltr;
+            text-align: left;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        #configInput {
+            min-height: 100px;
+        }
+
+        #jsonOutput {
+            min-height: 300px;
+            white-space: pre-wrap;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: #000;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        #copyBtn {
+            background-color: var(--success-color);
+            margin-top: 10px;
+        }
+
+        #copyBtn:hover {
+            background-color: #01bdae;
+        }
+
+        .output-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .label-title {
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: block;
+            color: #aaa;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>تبدیل لینک V2Ray به Config.json</h1>
+        
+        <div>
+            <label class="label-title" for="configInput">لینک کانفیگ خود را وارد کنید (vless یا vmess):</label>
+            <textarea id="configInput" placeholder="کانفیگ خود را وارد کنید..."></textarea>
+        </div>
+        
+        <button id="convertBtn">تبدیل اکانت</button>
+        
+        <div class="output-section" id="outputContainer">
+            <label class="label-title">خروجی JSON (config.json):</label>
+            <textarea id="jsonOutput" readonly></textarea>
+            <button id="copyBtn">کپی کانفیگ</button>
+        </div>
+    </div>
+
+    <script>
+        // ساختار پایه JSON مورد نظر شما
+        const baseConfig = {
+            "log": {
+                "loglevel": "warning",
+                "dnsLog": false,
+                "access": "none"
+            },
+            "dns": {
+                "hosts": {
+                    "dns.google": [
+                        "8.8.8.8"
+                    ],
+                    "proxy.example.com": [
+                        "127.0.0.1"
+                    ]
+                },
+                "servers": [
+                    {
+                        "address": "8.8.8.8",
+                        "skipFallback": true
+                    }
+                ],
+                "tag": "dns-module"
+            },
+            "policy": {
+                "levels": {
+                    "0": {
+                        "uplinkOnly": 0,
+                        "downlinkOnly": 0
+                    }
+                }
+            },
+            "inbounds": [
+                {
+                    "tag": "socks",
+                    "port": 10808,
+                    "listen": "0.0.0.0",
+                    "protocol": "mixed",
+                    "sniffing": {
+                        "enabled": true,
+                        "destOverride": [
+                            "http",
+                            "tls",
+                            "quic",
+                            "fakedns"
+                        ],
+                        "routeOnly": false
+                    },
+                    "settings": {
+                        "auth": "noauth",
+                        "udp": true,
+                        "allowTransparent": false
+                    }
+                },
+                {
+                    "tag": "tls-decrypt-h211",
+                    "listen": "0.0.0.0",
+                    "port": 40444,
+                    "protocol": "tunnel",
+                    "settings": {
+                        "network": "tcp",
+                        "port": 443,
+                        "followRedirect": true
+                    },
+                    "streamSettings": {
+                        "sockopt": {
+                            "tcpKeepAliveInterval": 1,
+                            "tcpKeepAliveIdle": 11
+                        },
+                        "security": "tls",
+                        "tlsSettings": {
+                            "alpn": ["h2", "http/1.1"],
+                            "certificates": [
+                                {
+                                    "usage": "issue",
+                                    "buildChain": true,
+                                    "certificate": [
+                                        "-----BEGIN CERTIFICATE-----",
+                                        "MIIBozCCAUmgAwIBAgIQcEap9OyNauSbu9WIjBrE7DAKBggqhkjOPQQDAjAmMREw",
+                                        "DwYDVQQKEwhYcmF5IEluYzERMA8GA1UEAxMIWHJheSBJbmMwIBcNMjYwODA3MTU0",
+                                        "NjQ5WhgPMjE0MDA5MDUwODQ2NDlaMCYxETAPBgNVBAoTCFhyYXkgSW5jMREwDwYD",
+                                        "VQQDEwhYcmF5IEluYzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABPPO9mvAOSm9",
+                                        "+zuukL9WsgyoczQimK2xxFfDHZOvGLq3TXiCNeVwTqiCBsqwx424yhUUT8rK8HPb",
+                                        "WPAYDE6ttaujVzBVMA4GA1UdDwEB/wQEAwICpDATBgNVHSUEDDAKBggrBgEFBQcD",
+                                        "ATAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSqTVNjHBZAJhMgLyC57rMYUsSW",
+                                        "jjAKBggqhkjOPQQDAgNIADBFAiBpvu+yogzeo7NqaXOiD+sHhC6E0RijO8ogkUX6",
+                                        "2ebPhwIhAO2yiZfK22SOYSVmJ7BuMbkAn45WrglHsqz8p4J+DaLS",
+                                        "-----END CERTIFICATE-----"
+                                    ],
+                                    "key": [
+                                        "-----BEGIN RSA PRIVATE KEY-----",
+                                        "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg35ZH25uH4yAEnemA",
+                                        "w5EQ72jDwGq78+wT6iOxzbzWdFKhRANCAATzzvZrwDkpvfs7rpC/VrIMqHM0Ipit",
+                                        "scRXwx2Trxi6t014gjXlcE6oggbKsMeNuMoVFE/KyvBz21jwGAxOrbWr",
+                                        "-----END RSA PRIVATE KEY-----"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            "outbounds": [
+                {
+                    "tag": "proxy",
+                    "protocol": "vless",
+                    "settings": {
+                        "vnext": [
+                            {
+                                "address": "127.0.0.1",
+                                "port": 40444,
+                                "users": [
+                                    {
+                                        "id": "",
+                                        "email": "t@t.tt",
+                                        "security": "auto",
+                                        "encryption": "none"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "streamSettings": {
+                        "network": "ws",
+                        "security": "tls",
+                        "tlsSettings": {
+                            "serverName": "",
+                            "alpn": ["http/1.1"],
+                            "fingerprint": "ios",
+                            "pinnedPeerCertSha256": "3de5b7bd48c18c9ff057d8961f24c16555a7e387ebb509e1efb1315303695c82"
+                        },
+                        "wsSettings": {
+                            "path": "/",
+                            "host": "",
+                            "headers": {
+                                "User-Agent": "edge"
+                            }
+                        }
+                    },
+                    "mux": {
+                        "enabled": false,
+                        "concurrency": -1
+                    }
+                },
+                {
+                    "tag": "tls-repack-frommitm",
+                    "protocol": "direct",
+                    "settings": {
+                        "redirect": "188.114.97.2:443"
+                    },
+                    "streamSettings": {
+                        "security": "tls",
+                        "tlsSettings": {
+                            "serverName": "fromMitM",
+                            "verifyPeerCertByName": "fromMitM",
+                            "alpn": ["fromMitM"],
+                            "fingerprint": "unsafe",
+                            "cipherSuites": "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256:TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384:TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384:TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256:TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256:TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA:TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA:TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256:TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
+                        },
+                        "finalmask": {
+                            "tcp": [
+                                {"type": "fragment", "settings": {"packets": "tlshello", "lengths": ["5", "94", "1"], "delays": ["0"], "maxSplit": "0"}},
+                                {"type": "fragment", "settings": {"packets": "1-1", "lengths": ["109", "1"], "delays": ["1"], "maxSplit": "355"}}
+                            ]
+                        }
+                    }
+                },
+                {
+                    "tag": "direct",
+                    "protocol": "freedom",
+                    "streamSettings": {
+                        "sockopt": {
+                            "domainStrategy": "UseIP"
+                        }
+                    }
+                },
+                {
+                    "tag": "block",
+                    "protocol": "blackhole"
+                }
+            ],
+            "routing": {
+                "domainStrategy": "IPIfNonMatch",
+                "rules": [
+                    {
+                        "type": "field",
+                        "inboundTag": ["tls-decrypt-h211"],
+                        "outboundTag": "tls-repack-frommitm"
+                    },
+                    {
+                        "type": "field",
+                        "outboundTag": "direct",
+                        "domain": [
+                            "domain:.ir"
+                        ]
+                    },
+                    {
+                        "type": "field",
+                        "outboundTag": "direct",
+                        "ip": [
+                            "geoip:ir",
+                            "geoip:private"
+                        ]
+                    },
+                    {
+                        "type": "field",
+                        "inboundTag": [
+                            "dns-module"
+                        ],
+                        "outboundTag": "proxy"
+                    }
+                ]
+            }
+        };
+
+        document.getElementById('convertBtn').addEventListener('click', function() {
+            const inputStr = document.getElementById('configInput').value.trim();
+            
+            if (!inputStr) {
+                alert("ابتدا لطفاً لینک کانفیگ خود را در کادر بالا وارد کنید.");
+                return;
+            }
+
+            let uuid = "", sni = "", host = "";
+
+            try {
+                // استخراج اطلاعات اگر لینک vmess (Base64) باشد
+                if (inputStr.startsWith("vmess://")) {
+                    const base64Str = inputStr.substring(8);
+                    // Decode base64
+                    const decoded = decodeURIComponent(escape(atob(base64Str)));
+                    const vmessObj = JSON.parse(decoded);
+                    
+                    uuid = vmessObj.id || "";
+                    sni = vmessObj.sni || vmessObj.host || vmessObj.add || "";
+                    host = vmessObj.host || vmessObj.add || "";
+                } 
+                // استخراج اطلاعات برای لینک‌های استاندارد مثل vless:// یا trojan://
+                else {
+                    const fakeUrlStr = inputStr.replace(/^[a-zA-Z]+:\/\//, 'http://');
+                    const url = new URL(fakeUrlStr);
+                    
+                    uuid = url.username;
+                    sni = url.searchParams.get('sni') || url.hostname;
+                    host = url.searchParams.get('host') || url.hostname;
+                }
+            } catch (e) {
+                // روش جایگزین با Regex در صورتی که URL نامعتبر باشد
+                const uuidMatch = inputStr.match(/:\/\/(.+?)@/);
+                if (uuidMatch) uuid = uuidMatch[1];
+                
+                const sniMatch = inputStr.match(/[?&]sni=([^&#]+)/);
+                if (sniMatch) sni = sniMatch[1];
+                
+                const hostMatch = inputStr.match(/[?&]host=([^&#]+)/);
+                if (hostMatch) host = hostMatch[1];
+            }
+
+            if (!uuid) {
+                alert("شناسه UUID در این کانفیگ یافت نشد! لطفاً یک کانفیگ معتبر وارد کنید.");
+                return;
+            }
+
+            // اگر SNI یا Host در لینک موجود نبود، از دیگری استفاده کن (جهت اطمینان)
+            if (!sni) sni = host || "your-domain.com";
+            if (!host) host = sni || "your-domain.com";
+
+            // یک کپی از فایل قالب (Template) می‌گیریم تا اصلی تغییر نکند
+            const newConfig = JSON.parse(JSON.stringify(baseConfig));
+
+            // جاگذاری مقادیر استخراج شده در قالب
+            newConfig.outbounds[0].settings.vnext[0].users[0].id = uuid;
+            newConfig.outbounds[0].streamSettings.tlsSettings.serverName = sni;
+            newConfig.outbounds[0].streamSettings.wsSettings.host = host;
+
+            // نمایش خروجی JSON در کادر
+            const outputElem = document.getElementById('jsonOutput');
+            outputElem.value = JSON.stringify(newConfig, null, 2);
+            
+            // نمایش بخش خروجی
+            document.getElementById('outputContainer').style.display = 'block';
+        });
+
+        // تنظیم عملکرد دکمه کپی
+        document.getElementById('copyBtn').addEventListener('click', function() {
+            const outputElem = document.getElementById('jsonOutput');
+            outputElem.select();
+            outputElem.setSelectionRange(0, 99999); // برای موبایل
+            
+            navigator.clipboard.writeText(outputElem.value).then(() => {
+                const btn = document.getElementById('copyBtn');
+                const originalText = btn.innerText;
+                btn.innerText = "کانفیگ کپی شد! ✔";
+                btn.style.backgroundColor = "#4caf50";
+                
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.backgroundColor = "var(--success-color)";
+                }, 2000);
+            }).catch(err => {
+                alert("خطا در کپی کردن: " + err);
+            });
+        });
+    </script>
+</body>
+</html>
