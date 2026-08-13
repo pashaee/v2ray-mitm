@@ -18,8 +18,12 @@
             --success-color: #03dac6;
         }
 
+        /* اعمال اجباری فونت وزیر برای تمام عناصر صفحه */
+        * {
+            font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+        }
+
         body {
-            font-family: 'Vazirmatn', Tahoma, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             display: flex;
@@ -47,7 +51,7 @@
             text-align: center;
             margin: 0;
             font-size: 1.5rem;
-            color: var(--primary-color);
+            color: #ffffff; /* تغییر رنگ عنوان به سفید */
         }
 
         textarea {
@@ -57,12 +61,9 @@
             color: var(--text-color);
             border-radius: 8px;
             padding: 15px;
-            font-family: monospace;
             font-size: 14px;
             resize: vertical;
             box-sizing: border-box;
-            direction: ltr;
-            text-align: left;
         }
 
         textarea:focus {
@@ -70,13 +71,19 @@
             border-color: var(--primary-color);
         }
 
+        /* راست‌چین کردن کادر ورود کانفیگ */
         #configInput {
             min-height: 100px;
+            direction: rtl;
+            text-align: right;
         }
 
+        /* چپ‌چین ماندن خروجی JSON برای خوانایی بهتر کدها */
         #jsonOutput {
             min-height: 300px;
             white-space: pre-wrap;
+            direction: ltr;
+            text-align: left;
         }
 
         button {
@@ -87,7 +94,6 @@
             border-radius: 8px;
             font-size: 16px;
             font-weight: bold;
-            font-family: inherit;
             cursor: pointer;
             transition: background-color 0.3s ease;
             width: 100%;
@@ -144,7 +150,7 @@
     </div>
 
     <script>
-        // ساختار پایه JSON مورد نظر شما
+        // ساختار پایه JSON مورد نظر شما (بخش host حذف شد)
         const baseConfig = {
             "log": {
                 "loglevel": "warning",
@@ -277,7 +283,6 @@
                         },
                         "wsSettings": {
                             "path": "/",
-                            "host": "",
                             "headers": {
                                 "User-Agent": "edge"
                             }
@@ -367,28 +372,25 @@
                 return;
             }
 
-            let uuid = "", sni = "", host = "";
+            let uuid = "", sni = "";
 
             try {
                 // استخراج اطلاعات اگر لینک vmess (Base64) باشد
                 if (inputStr.startsWith("vmess://")) {
                     const base64Str = inputStr.substring(8);
-                    // Decode base64
                     const decoded = decodeURIComponent(escape(atob(base64Str)));
                     const vmessObj = JSON.parse(decoded);
                     
                     uuid = vmessObj.id || "";
                     sni = vmessObj.sni || vmessObj.host || vmessObj.add || "";
-                    host = vmessObj.host || vmessObj.add || "";
                 } 
-                // استخراج اطلاعات برای لینک‌های استاندارد مثل vless:// یا trojan://
+                // استخراج اطلاعات برای لینک‌های استاندارد مثل vless:// 
                 else {
                     const fakeUrlStr = inputStr.replace(/^[a-zA-Z]+:\/\//, 'http://');
                     const url = new URL(fakeUrlStr);
                     
                     uuid = url.username;
                     sni = url.searchParams.get('sni') || url.hostname;
-                    host = url.searchParams.get('host') || url.hostname;
                 }
             } catch (e) {
                 // روش جایگزین با Regex در صورتی که URL نامعتبر باشد
@@ -397,9 +399,6 @@
                 
                 const sniMatch = inputStr.match(/[?&]sni=([^&#]+)/);
                 if (sniMatch) sni = sniMatch[1];
-                
-                const hostMatch = inputStr.match(/[?&]host=([^&#]+)/);
-                if (hostMatch) host = hostMatch[1];
             }
 
             if (!uuid) {
@@ -407,17 +406,14 @@
                 return;
             }
 
-            // اگر SNI یا Host در لینک موجود نبود، از دیگری استفاده کن (جهت اطمینان)
-            if (!sni) sni = host || "your-domain.com";
-            if (!host) host = sni || "your-domain.com";
+            if (!sni) sni = "your-domain.com"; // مقدار پیش‌فرض در صورت نیافتن sni
 
-            // یک کپی از فایل قالب (Template) می‌گیریم تا اصلی تغییر نکند
+            // یک کپی از فایل قالب می‌گیریم تا اصلی تغییر نکند
             const newConfig = JSON.parse(JSON.stringify(baseConfig));
 
-            // جاگذاری مقادیر استخراج شده در قالب
+            // جاگذاری مقادیر استخراج شده در قالب (بخش host حذف شده است)
             newConfig.outbounds[0].settings.vnext[0].users[0].id = uuid;
             newConfig.outbounds[0].streamSettings.tlsSettings.serverName = sni;
-            newConfig.outbounds[0].streamSettings.wsSettings.host = host;
 
             // نمایش خروجی JSON در کادر
             const outputElem = document.getElementById('jsonOutput');
