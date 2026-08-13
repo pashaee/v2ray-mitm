@@ -51,8 +51,8 @@
         h1 {
             text-align: center;
             margin: 0;
-            font-size: 1.3rem; /* سایز متناسب‌تر */
-            font-weight: 500;  /* کاهش ضخامت برای ظریف‌تر شدن */
+            font-size: 1.3rem;
+            font-weight: 500;
             color: #ffffff;
             letter-spacing: 0.5px;
         }
@@ -175,8 +175,9 @@
     </div>
 
     <script>
-        // ساختار پایه JSON مورد نظر شما با تنظیمات ضد نشت DNS و سرور AdGuard
+        // ساختار پایه JSON مورد نظر شما
         const baseConfig = {
+            "remarks": "",
             "log": {
                 "loglevel": "warning",
                 "dnsLog": false,
@@ -393,7 +394,7 @@
                 return;
             }
 
-            let uuid = "", sni = "";
+            let uuid = "", sni = "", accountName = "";
 
             try {
                 // استخراج اطلاعات اگر لینک vmess (Base64) باشد
@@ -404,6 +405,7 @@
                     
                     uuid = vmessObj.id || "";
                     sni = vmessObj.sni || vmessObj.host || vmessObj.add || "";
+                    accountName = vmessObj.ps || "";
                 } 
                 // استخراج اطلاعات برای لینک‌های استاندارد مثل vless:// 
                 else {
@@ -412,6 +414,11 @@
                     
                     uuid = url.username;
                     sni = url.searchParams.get('sni') || url.hostname;
+                    
+                    // استخراج نام اکانت از هشتگ (hash)
+                    if (url.hash) {
+                        accountName = decodeURIComponent(url.hash.substring(1));
+                    }
                 }
             } catch (e) {
                 // روش جایگزین با Regex در صورتی که URL نامعتبر باشد
@@ -420,6 +427,9 @@
                 
                 const sniMatch = inputStr.match(/[?&]sni=([^&#]+)/);
                 if (sniMatch) sni = sniMatch[1];
+                
+                const nameMatch = inputStr.match(/#(.+)$/);
+                if (nameMatch) accountName = decodeURIComponent(nameMatch[1]);
             }
 
             if (!uuid) {
@@ -427,10 +437,17 @@
                 return;
             }
 
-            if (!sni) sni = "your-domain.com"; // مقدار پیش‌فرض در صورت نیافتن sni
+            if (!sni) sni = "your-domain.com";
 
             // یک کپی از فایل قالب می‌گیریم تا اصلی تغییر نکند
             const newConfig = JSON.parse(JSON.stringify(baseConfig));
+
+            // ایجاد متن remarks با اضافه کردن "اصلاح شده"
+            if (accountName) {
+                newConfig.remarks = accountName + " اصلاح شده";
+            } else {
+                newConfig.remarks = "کانفیگ اصلاح شده";
+            }
 
             // جاگذاری مقادیر استخراج شده در قالب
             newConfig.outbounds[0].settings.vnext[0].users[0].id = uuid;
