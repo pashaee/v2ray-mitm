@@ -181,14 +181,20 @@
             "log": {
                 "loglevel": "warning"
             },
-            "dns": {
-                "hosts": {
-                    "dns.adguard-dns.com": "94.140.14.14"
-                },
-                "servers": [
-                    "https://dns.adguard-dns.com/dns-query"
-                ]
-            },
+  "fakedns": [
+    {
+      "ipPool": "198.18.0.0/15",
+      "poolSize": 65535
+    }
+  ],
+  "dns": {
+    "servers": [
+      "fakedns",
+      "https://8.8.8.8/dns-query"
+    ],
+    "queryStrategy": "UseIPv4",
+    "disableCache": false
+  },
             "policy": {
                 "levels": {
                     "0": {
@@ -355,9 +361,7 @@
                     },
                     {
                         "type": "field",
-                        "domain": [
-                            "domain:adguard-dns.com"
-                        ],
+                        "ip": [ "8.8.8.8" ],
                         "outboundTag": "proxy"
                     },
                     {
