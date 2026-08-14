@@ -190,7 +190,7 @@
   "dns": {
     "servers": [
       "fakedns",
-      "https://8.8.8.8/dns-query"
+      "https://1.1.1.1/dns-query"
     ],
     "queryStrategy": "UseIPv4",
     "disableCache": false
@@ -247,27 +247,9 @@
                                 {
                                     "usage": "issue",
                                     "buildChain": true,
-                                    "certificate": [
-                                        "-----BEGIN CERTIFICATE-----",
-                                        "MIIBozCCAUmgAwIBAgIQcEap9OyNauSbu9WIjBrE7DAKBggqhkjOPQQDAjAmMREw",
-                                        "DwYDVQQKEwhYcmF5IEluYzERMA8GA1UEAxMIWHJheSBJbmMwIBcNMjYwODA3MTU0",
-                                        "NjQ5WhgPMjE0MDA5MDUwODQ2NDlaMCYxETAPBgNVBAoTCFhyYXkgSW5jMREwDwYD",
-                                        "VQQDEwhYcmF5IEluYzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABPPO9mvAOSm9",
-                                        "+zuukL9WsgyoczQimK2xxFfDHZOvGLq3TXiCNeVwTqiCBsqwx424yhUUT8rK8HPb",
-                                        "WPAYDE6ttaujVzBVMA4GA1UdDwEB/wQEAwICpDATBgNVHSUEDDAKBggrBgEFBQcD",
-                                        "ATAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSqTVNjHBZAJhMgLyC57rMYUsSW",
-                                        "jjAKBggqhkjOPQQDAgNIADBFAiBpvu+yogzeo7NqaXOiD+sHhC6E0RijO8ogkUX6",
-                                        "2ebPhwIhAO2yiZfK22SOYSVmJ7BuMbkAn45WrglHsqz8p4J+DaLS",
-                                        "-----END CERTIFICATE-----"
-                                    ],
-                                    "key": [
-                                        "-----BEGIN RSA PRIVATE KEY-----",
-                                        "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg35ZH25uH4yAEnemA",
-                                        "w5EQ72jDwGq78+wT6iOxzbzWdFKhRANCAATzzvZrwDkpvfs7rpC/VrIMqHM0Ipit",
-                                        "scRXwx2Trxi6t014gjXlcE6oggbKsMeNuMoVFE/KyvBz21jwGAxOrbWr",
-                                        "-----END RSA PRIVATE KEY-----"
-                                    ]
-                                }
+                                    "certificate": [ "-----BEGIN CERTIFICATE-----", "MIIBozCCAUmgAwIBAgIQcEap9OyNauSbu9WIjBrE7DAKBggqhkjOPQQDAjAmMREw", "DwYDVQQKEwhYcmF5IEluYzERMA8GA1UEAxMIWHJheSBJbmMwIBcNMjYwODA3MTU0", "NjQ5WhgPMjE0MDA5MDUwODQ2NDlaMCYxETAPBgNVBAoTCFhyYXkgSW5jMREwDwYD", "VQQDEwhYcmF5IEluYzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABPPO9mvAOSm9", "+zuukL9WsgyoczQimK2xxFfDHZOvGLq3TXiCNeVwTqiCBsqwx424yhUUT8rK8HPb", "WPAYDE6ttaujVzBVMA4GA1UdDwEB/wQEAwICpDATBgNVHSUEDDAKBggrBgEFBQcD", "ATAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSqTVNjHBZAJhMgLyC57rMYUsSW", "jjAKBggqhkjOPQQDAgNIADBFAiBpvu+yogzeo7NqaXOiD+sHhC6E0RijO8ogkUX6", "2ebPhwIhAO2yiZfK22SOYSVmJ7BuMbkAn45WrglHsqz8p4J+DaLS", "-----END CERTIFICATE-----" ],
+              "key": [ "-----BEGIN EC PRIVATE KEY-----", "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg35ZH25uH4yAEnemA", "w5EQ72jDwGq78+wT6iOxzbzWdFKhRANCAATzzvZrwDkpvfs7rpC/VrIMqHM0Ipit", "scRXwx2Trxi6t014gjXlcE6oggbKsMeNuMoVFE/KyvBz21jwGAxOrbWr", "-----END EC PRIVATE KEY-----" ]
+            }
                             ]
                         }
                     }
@@ -361,7 +343,7 @@
                     },
                     {
                         "type": "field",
-                        "ip": [ "8.8.8.8" ],
+                        "ip": [ "1.1.1.1" ],
                         "outboundTag": "proxy"
                     },
                     {
