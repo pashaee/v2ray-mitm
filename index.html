@@ -268,14 +268,18 @@
                             "fingerprint": "ios",
                             "pinnedPeerCertSha256": "3de5b7bd48c18c9ff057d8961f24c16555a7e387ebb509e1efb1315303695c82"
                         },
-                        "wsSettings": {
-                            "path": "/",
-                            "headers": {
-                                "User-Agent": "edge"
-                            }
-                        }
-                    }
-                },
+                               "wsSettings": {
+          "path": "/",
+          "headers": {
+            "User-Agent": "edge"
+          }
+        }
+      },
+      "mux": {
+        "enabled": false,
+        "concurrency": -1
+      }
+    },
                 {
                     "tag": "tls-repack-frommitm",
                     "protocol": "direct",
